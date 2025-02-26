@@ -4,11 +4,11 @@ class QueryBuilder {
         this.query = supabase.from(tableName);
     }
 
-    #convertSnakeToCamel(snakeCase) {
+    #convertCamelToSnake(snakeCase) {
         return snakeCase.replace(/([A-Z])/g, "_$1").toLowerCase();
     }
 
-    #convertCamelToSnake(camelCase) {
+    #convertSnakeToCamel(camelCase) {
         return camelCase.replace(/_([a-z])/g, (_, letter) => {
             return letter.toUpperCase();
         });
@@ -17,7 +17,7 @@ class QueryBuilder {
     #deserilizeData(data) {
         let deSerilizedData = {};
         Object.keys(data).forEach(key => {
-            deSerilizedData[this.#convertCamelToSnake(key)] = data[key];
+            deSerilizedData[this.#convertSnakeToCamel(key)] = data[key];
         })
         return deSerilizedData;
     }
@@ -25,7 +25,7 @@ class QueryBuilder {
     #serilizeData(data) {
         let serlizedData = {};
         Object.keys(data).forEach(key => {
-            serlizedData[this.#convertSnakeToCamel(key)] = data[key];
+            serlizedData[this.#convertCamelToSnake(key)] = data[key];
         })
         return serlizedData;
     }
