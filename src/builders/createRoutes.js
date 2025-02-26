@@ -25,10 +25,10 @@ const createRouters = (tableName) => {
         return await responseHandler({ action: queryBuilder.getAll(), res });
     })
 
-    router.get("/:column/:value", async (req, res) => {
-        let { column, value } = req.params
+    router.get("/:column/:matchingValue", async (req, res) => {
+        let { column, matchingValue } = req.params
         let queryBuilder = new QueryBuilder(supabase, tableName);
-        return await responseHandler({ action: queryBuilder.getBy({ column, value }), res })
+        return await responseHandler({ action: queryBuilder.getBy({ column, matchingValue }), res })
     })
 
     router.post("", async (req, res) => {
@@ -54,4 +54,4 @@ const createRouters = (tableName) => {
     return router;
 }
 
-module.exports = createRouters
+module.exports = createRouters 
