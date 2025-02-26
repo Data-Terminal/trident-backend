@@ -36,26 +36,31 @@ class QueryBuilder {
         return this;
     }
 
-    getBy({ column, value: matchingValue, projections = [] }) {
+    getBy({ column, matchingValue, projections = [] }) {
+        if (!column && matchingValue) return;
         console.log(`Fetching matched records from "${this.tableName}" table with column:${this.#convertSnakeToCamel(column)},value:${matchingValue}`);
         this.query = this.query.select(projections.join(",")).eq(this.#convertSnakeToCamel(column), matchingValue);
         return this;
     }
 
     update({ column, matchingValue, data }) {
-        console.log(`Updating a record using column:${column} matching with:${matchingValue}`);
+        if(!column && matchingValue) return;
+        console.log(`Updating a record using column:${this.#convertCamelToSnake(column)} matching with:${matchingValue}`);
         let serilizedData = this.#serilizeData(data);
-        this.query = this.query.update(serilizedData).eq(this.#convertSnakeToCamel(column), matchingValue);
+        this.query = this.query.update(serilizedData).eq(this.#convertCamelToSnake(column), matchingValue);
         return this;
     }
 
     delete({ column, matchingValue }) {
-        console.log(`Deleting a record using column:${column} matching with:${matchingValue}`);
-        this.query = this.query.delete().eq(this.#convertSnakeToCamel(column), matchingValue);
+        if (!column && matchingValue) return;
+        let newColumnName = this.#convertCamelToSnake(column);
+        console.log(`Deleting a record using column:${newColumnName} matching with:${matchingValue}`);
+        this.query = this.query.delete().eq(newColumnName, matchingValue);
         return this;
     }
 
     insert(dataObject) {
+        if (!column && matchingValue) return;
         console.log(`Inserting a record into "${this.tableName}" table with data:${JSON.stringify(dataObject)}`);
         let serilizedData = this.#serilizeData(dataObject);
         this.query = this.query.insert(serilizedData);

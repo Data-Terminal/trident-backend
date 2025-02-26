@@ -2,7 +2,7 @@ const express = require("express");
 const supabase = require("../supabase")
 const QueryBuilder = require("./QueryBuilder")
 
-const responseHandler = async (action, res) => {
+const responseHandler = async ({ action, res }) => {
     try {
         let data = await action.execute();
         res.status(200).send({
@@ -22,19 +22,33 @@ const createRouters = (tableName) => {
 
     router.get("", async (req, res) => {
         let queryBuilder = new QueryBuilder(supabase, tableName);
-        return await responseHandler(queryBuilder.getAll(), res);
+        return await responseHandler({ action: queryBuilder.getAll(), res });
     })
 
     router.get("/:column/:value", async (req, res) => {
         let { column, value } = req.params
         let queryBuilder = new QueryBuilder(supabase, tableName);
-        return await responseHandler(queryBuilder.getBy({ column, value }), res)
+        return await responseHandler({ action: queryBuilder.getBy({ column, value }), res })
     })
 
-    router.post("/", async (req, res) => {
+    router.post("", async (req, res) => {
         let body = req.body;
         let queryBuilder = new QueryBuilder(supabase, tableName);
-        return responseHandler(queryBuilder.insert(body), res);
+        return responseHandler({ action: queryBuilder.insert(body), res });
+    })
+
+    router.patch("/:column/:matchingValue", async (req, res) => {
+        const { column, matchingValue } = req.params
+        const payload = req.body;
+
+        let queryBuilder = new QueryBuilder(supabase, tableName)
+        return await responseHandler({ action: queryBuilder.update({ column, matchingValue, data: payload }), res })
+    })
+
+    router.delete("/:column/:matchingValue", (req, res) => {
+        const { column, matchingValue } = req.params
+        let queryBuilder = new QueryBuilder(supabase, tableName)
+        return responseHandler({ action: queryBuilder.delete({ column, matchingValue }), res });
     })
 
     return router;
