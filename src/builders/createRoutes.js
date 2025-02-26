@@ -2,23 +2,24 @@ const express = require("express");
 const supabase = require("../supabase")
 const QueryBuilder = require("./QueryBuilder")
 
-const responseHandler = async ({ action, res }) => {
-    try {
-        let data = await action.execute();
-        res.status(200).send({
-            data,
-            message: "Success"
-        })
-    } catch (error) {
-        res.status(500).send({
-            message: error.message,
-            error
-        })
-    }
-}
-
 const createRouters = (tableName) => {
     let router = express.Router();
+
+    const responseHandler = async ({ action, res }) => {
+        try {
+            let data = await action.execute();
+            res.status(200).send({
+                message: `Successfull operation from table:${tableName}`,
+                data
+            })
+        } catch (error) {
+            res.status(500).send({
+                message: error.message,
+                error
+            })
+        }
+    }
+
 
     router.get("", async (req, res) => {
         let queryBuilder = new QueryBuilder(supabase, tableName);
