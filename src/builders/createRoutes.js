@@ -2,10 +2,10 @@ const express = require("express");
 const supabase = require("../supabase");
 const QueryBuilder = require("./QueryBuilder");
 
-const createRouters = (tableName) => {
-  let router = express.Router();
+const createRouters = () => {
+  let router = express.Router({ mergeParams: true });
 
-  const responseHandler = async ({ action, res }) => {
+  const responseHandler = async ({ action, res, tableName }) => {
     try {
       let data = await action.execute();
       res.status(200).send({
@@ -21,12 +21,13 @@ const createRouters = (tableName) => {
   };
 
   router.get("", async (req, res) => {
+    let { tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
     return await responseHandler({ action: queryBuilder.getAll(), res });
   });
 
   router.get("/:column/:matchingValue", async (req, res) => {
-    let { column, matchingValue } = req.params;
+    let { column, matchingValue, tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
     return await responseHandler({
       action: queryBuilder.getBy({ column, matchingValue }),
@@ -36,12 +37,13 @@ const createRouters = (tableName) => {
 
   router.post("", async (req, res) => {
     let body = req.body;
+    let { tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
     return responseHandler({ action: queryBuilder.insert(body), res });
   });
 
   router.patch("/:column/:matchingValue", async (req, res) => {
-    const { column, matchingValue } = req.params;
+    const { column, matchingValue, tableName } = req.params;
     const payload = req.body;
 
     let queryBuilder = new QueryBuilder(supabase, tableName);
@@ -52,7 +54,7 @@ const createRouters = (tableName) => {
   });
 
   router.delete("/:column/:matchingValue", (req, res) => {
-    const { column, matchingValue } = req.params;
+    const { column, matchingValue, tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
     return responseHandler({
       action: queryBuilder.delete({ column, matchingValue }),
@@ -62,6 +64,7 @@ const createRouters = (tableName) => {
 
   router.delete("", (req, res) => {
     const payload = req.body;
+    let { tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
     return responseHandler({ action: queryBuilder.deleteMany(payload), res });
   });

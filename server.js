@@ -1,16 +1,15 @@
 const express = require("express");
-require('dotenv').config()
+require("dotenv").config();
 
 const apiRoutes = require("./apiRoutes");
 const app = express();
 app.use(express.json());
 
-app.use("/v1", apiRoutes)
-
-app.use((err, _, res) => {
-    res.status(err.status || 500).json({ message: err.message });
+app.get("", (req, res) => {
+  res.send({ message: "Welcome to nodejs backend server" });
 });
+app.use("/v1", apiRoutes);
 
-app.listen(4000, () => {
-    console.log("App started running")
-})
+app.listen(process.env.PORT, () => {
+  console.log(`App started running on port:${process.env.port}`);
+});
