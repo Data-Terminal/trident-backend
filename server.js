@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
   cors({
-    origin: "*", // Change this to your frontend URL for security (e.g., "https://yourfrontend.vercel.app")
+    origin: "https://trident-erp-ui.vercel.app/", // Change this to your frontend URL for security (e.g., "https://yourfrontend.vercel.app")
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
