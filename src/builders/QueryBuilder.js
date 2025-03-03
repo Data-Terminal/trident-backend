@@ -72,9 +72,13 @@ class QueryBuilder {
     return this;
   }
 
-  deleteMany({ ids }) {
-    if (!ids.length <= 0) return;
-    this.query = this.query.delete().in(ids);
+  deleteMany({ ids, field }) {
+    let updatedField = this.#convertCamelToSnake(field);
+    console.log(
+      `Deleting multiple records matching with field:${updatedField} and ids:${ids}`
+    );
+    if (ids.length <= 0) return this;
+    this.query = this.query.delete().in(updatedField, ids);
     return this;
   }
 

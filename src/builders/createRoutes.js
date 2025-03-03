@@ -23,7 +23,11 @@ const createRouters = () => {
   router.get("", async (req, res) => {
     let { tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
-    return await responseHandler({ action: queryBuilder.getAll(), res });
+    return await responseHandler({
+      action: queryBuilder.getAll(),
+      res,
+      tableName,
+    });
   });
 
   router.get("/:column/:matchingValue", async (req, res) => {
@@ -32,14 +36,30 @@ const createRouters = () => {
     return await responseHandler({
       action: queryBuilder.getBy({ column, matchingValue }),
       res,
+      tableName,
     });
   });
 
-  router.post("", async (req, res) => {
+  router.post("", async (req, res, next) => {
     let body = req.body;
     let { tableName } = req.params;
     let queryBuilder = new QueryBuilder(supabase, tableName);
-    return responseHandler({ action: queryBuilder.insert(body), res });
+    if (body.type === "delete") {
+      return responseHandler({
+        action: queryBuilder.deleteMany({
+          ids: body?.ids ?? [],
+          field: body.field ?? "",
+        }),
+        res,
+        tableName,
+      });
+    } else {
+      return responseHandler({
+        action: queryBuilder.insert(body),
+        res,
+        tableName,
+      });
+    }
   });
 
   router.patch("/:column/:matchingValue", async (req, res) => {
@@ -50,6 +70,7 @@ const createRouters = () => {
     return await responseHandler({
       action: queryBuilder.update({ column, matchingValue, data: payload }),
       res,
+      tableName,
     });
   });
 
@@ -59,16 +80,9 @@ const createRouters = () => {
     return responseHandler({
       action: queryBuilder.delete({ column, matchingValue }),
       res,
+      tableName,
     });
   });
-
-  router.delete("", (req, res) => {
-    const payload = req.body;
-    let { tableName } = req.params;
-    let queryBuilder = new QueryBuilder(supabase, tableName);
-    return responseHandler({ action: queryBuilder.deleteMany(payload), res });
-  });
-
   return router;
 };
 
