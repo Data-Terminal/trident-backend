@@ -31,7 +31,8 @@ class QueryBuilder {
   }
 
   getAll() {
-    console.log(`Fetching all the records from "${this.tableName}" table`);
+    const tableName = this.#convertCamelToSnake(this.tableName);
+    console.log(`Fetching all the records from "${tableName}" table`);
     this.query = this.query.select();
     return this;
   }
