@@ -83,7 +83,21 @@ class QueryBuilder {
     return this;
   }
 
+  insertMany(arrayObject) {
+    const serilizedData = arrayObject.map((item) => this.#serilizeData(item));
+    console.log(
+      `Inserting a record into "${
+        this.tableName
+      }" table with data:${JSON.stringify(serilizedData)}`
+    );
+    this.query = this.query.insert(serilizedData);
+    return this;
+  }
+
   insert(dataObject) {
+    if (Array.isArray(dataObject)) {
+      return this.insertMany(dataObject);
+    }
     console.log(
       `Inserting a record into "${
         this.tableName
